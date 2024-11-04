@@ -97,13 +97,7 @@ https://ryanmulligan.dev/blog/css-property-new-style/
     padding-box;
   background-size: var(--space) var(--space);
   background-repeat: space;
-  -webkit-mask-image: conic-gradient(
-    from calc(var(--gradient-angle) + 45deg),
-    black,
-    transparent 10% 90%,
-    black
-  );
-          mask-image: conic-gradient(
+  mask-image: conic-gradient(
     from calc(var(--gradient-angle) + 45deg),
     black,
     transparent 10% 90%,
@@ -125,8 +119,7 @@ https://ryanmulligan.dev/blog/css-property-new-style/
     var(--shiny-cta-highlight),
     transparent
   );
-  -webkit-mask-image: radial-gradient(circle at bottom, transparent 40%, black);
-          mask-image: radial-gradient(circle at bottom, transparent 40%, black);
+  mask-image: radial-gradient(circle at bottom, transparent 40%, black);
   opacity: 0.6;
 }
 
@@ -159,8 +152,7 @@ https://ryanmulligan.dev/blog/css-property-new-style/
 
   span::before {
     transition: opacity var(--transition);
-    -webkit-animation: calc(var(--duration) * 1.5) breathe linear infinite;
-            animation: calc(var(--duration) * 1.5) breathe linear infinite;
+    animation: calc(var(--duration) * 1.5) breathe linear infinite;
   }
 }
 
@@ -172,18 +164,11 @@ https://ryanmulligan.dev/blog/css-property-new-style/
   &,
   &::before,
   &::after {
-    -webkit-animation-play-state: running;
-            animation-play-state: running;
+    animation-play-state: running;
   }
 
   span::before {
     opacity: 1;
-  }
-}
-
-@-webkit-keyframes gradient-angle {
-  to {
-    --gradient-angle: 360deg;
   }
 }
 
@@ -193,25 +178,9 @@ https://ryanmulligan.dev/blog/css-property-new-style/
   }
 }
 
-@-webkit-keyframes shimmer {
-  to {
-    rotate: 360deg;
-  }
-}
-
 @keyframes shimmer {
   to {
     rotate: 360deg;
-  }
-}
-
-@-webkit-keyframes breathe {
-  from,
-  to {
-    scale: 1;
-  }
-  50% {
-    scale: 1.2;
   }
 }
 
@@ -240,4 +209,15 @@ body {
   font-weight: 500;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
+}
+
+.shiny-cta {
+  position: fixed;
+  top: 1rem;
+  right: 2.5rem; /* Increase this value to move the button slightly to the left */
+}
+
+.shiny-cta {
+  padding: calc(1.25rem * 0.4) calc(2.5rem * 0.4); /* Scale padding down by 60% */
+  font-size: calc(1.125rem * 0.4); /* Scale font size down by 60% */
 }
