@@ -1,176 +1,243 @@
+/*
+CSS @property and the New Style
+https://ryanmulligan.dev/blog/css-property-new-style/
+*/
+@import url("https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,500&display=swap");
+
 :root {
-  --space: 1rem;
-  --text: #f8fafc;
-  --surface-1: #020617;
-  --surface-2: #0f172a;
-  --surface-3: #1e293b;
-  --surface-4: #334155;
-  --btn-bg: #1d4ed8;
-  --gradient: linear-gradient(
-    20deg,
-    hsla(0 0% 0% / 0) 20%,
-    hsla(0 0% 100% / 0.065) 120%
-  );
+  --shiny-cta-bg: #000000;
+  --shiny-cta-bg-subtle: #1a1818;
+  --shiny-cta-fg: #ffffff;
+  --shiny-cta-highlight: blue;
+  --shiny-cta-highlight-subtle: #8484ff;
 }
 
-* {
-  box-sizing: border-box;
+@property --gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
 }
 
-body {
-  display: grid;
-  align-items: center;
-  min-height: 100vh;
-  font-family: system-ui, sans-serif;
-  line-height: 1.4;
-  color: var(--text);
-  background-color: var(--surface-1);
+@property --gradient-angle-offset {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
 }
 
-main {
-  margin-block: 2rem;
-  min-width: 0;
+@property --gradient-percent {
+  syntax: "<percentage>";
+  initial-value: 5%;
+  inherits: false;
 }
 
-h2 {
+@property --gradient-shine {
+  syntax: "<color>";
+  initial-value: white;
+  inherits: false;
+}
+
+.shiny-cta {
+  --animation: gradient-angle linear infinite;
+  --duration: 3s;
+  --shadow-size: 2px;
+  isolation: isolate;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  outline-offset: 4px;
+  padding: 1.25rem 2.5rem;
+  font-family: inherit;
+  font-size: 1.125rem;
   line-height: 1.2;
+  border: 1px solid transparent;
+  border-radius: 360px;
+  color: var(--shiny-cta-fg);
+  background: linear-gradient(var(--shiny-cta-bg), var(--shiny-cta-bg))
+      padding-box,
+    conic-gradient(
+        from calc(var(--gradient-angle) - var(--gradient-angle-offset)),
+        transparent,
+        var(--shiny-cta-highlight) var(--gradient-percent),
+        var(--gradient-shine) calc(var(--gradient-percent) * 2),
+        var(--shiny-cta-highlight) calc(var(--gradient-percent) * 3),
+        transparent calc(var(--gradient-percent) * 4)
+      )
+      border-box;
+  box-shadow: inset 0 0 0 1px var(--shiny-cta-bg-subtle);
+
+  &::before,
+  &::after,
+  span::before {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset-inline-start: 50%;
+    inset-block-start: 50%;
+    translate: -50% -50%;
+    z-index: -1;
+  }
+
+  &:active {
+    translate: 0 1px;
+  }
+}
+
+/* Dots pattern */
+.shiny-cta::before {
+  --size: calc(100% - var(--shadow-size) * 3);
+  --position: 2px;
+  --space: calc(var(--position) * 2);
+  width: var(--size);
+  height: var(--size);
+  background: radial-gradient(
+      circle at var(--position) var(--position),
+      white calc(var(--position) / 4),
+      transparent 0
+    )
+    padding-box;
+  background-size: var(--space) var(--space);
+  background-repeat: space;
+  -webkit-mask-image: conic-gradient(
+    from calc(var(--gradient-angle) + 45deg),
+    black,
+    transparent 10% 90%,
+    black
+  );
+          mask-image: conic-gradient(
+    from calc(var(--gradient-angle) + 45deg),
+    black,
+    transparent 10% 90%,
+    black
+  );
+  border-radius: inherit;
+  opacity: 0.4;
+  z-index: -1;
+}
+
+/* Inner shimmer */
+.shiny-cta::after {
+  --animation: shimmer linear infinite;
+  width: 100%;
+  aspect-ratio: 1;
+  background: linear-gradient(
+    -50deg,
+    transparent,
+    var(--shiny-cta-highlight),
+    transparent
+  );
+  -webkit-mask-image: radial-gradient(circle at bottom, transparent 40%, black);
+          mask-image: radial-gradient(circle at bottom, transparent 40%, black);
+  opacity: 0.6;
+}
+
+.shiny-cta span {
+  z-index: 1;
+
+  &::before {
+    --size: calc(100% + 1rem);
+    width: var(--size);
+    height: var(--size);
+    box-shadow: inset 0 -1ex 2rem 4px var(--shiny-cta-highlight);
+    opacity: 0;
+  }
+}
+
+/* Animate */
+.shiny-cta {
+  --transition: 800ms cubic-bezier(0.25, 1, 0.5, 1);
+  transition: var(--transition);
+  transition-property: --gradient-angle-offset, --gradient-percent,
+    --gradient-shine;
+
+  &,
+  &::before,
+  &::after {
+    animation: var(--animation) var(--duration),
+      var(--animation) calc(var(--duration) / 0.4) reverse paused;
+    animation-composition: add;
+  }
+
+  span::before {
+    transition: opacity var(--transition);
+    -webkit-animation: calc(var(--duration) * 1.5) breathe linear infinite;
+            animation: calc(var(--duration) * 1.5) breathe linear infinite;
+  }
+}
+
+.shiny-cta:is(:hover, :focus-visible) {
+  --gradient-percent: 20%;
+  --gradient-angle-offset: 95deg;
+  --gradient-shine: var(--shiny-cta-highlight-subtle);
+
+  &,
+  &::before,
+  &::after {
+    -webkit-animation-play-state: running;
+            animation-play-state: running;
+  }
+
+  span::before {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes gradient-angle {
+  to {
+    --gradient-angle: 360deg;
+  }
+}
+
+@keyframes gradient-angle {
+  to {
+    --gradient-angle: 360deg;
+  }
+}
+
+@-webkit-keyframes shimmer {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes shimmer {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@-webkit-keyframes breathe {
+  from,
+  to {
+    scale: 1;
+  }
+  50% {
+    scale: 1.2;
+  }
+}
+
+@keyframes breathe {
+  from,
+  to {
+    scale: 1;
+  }
+  50% {
+    scale: 1.2;
+  }
+}
+
+html,
+body {
+  height: 100%;
 }
 
 body {
-  padding-inline: var(--space);
-}
-
-section {
-  position: relative; /* Set relative positioning for absolute positioned arrow indicator pseudo elements */
-}
-
-section + section {
-  margin-block-start: 3rem;
-}
-
-.row {
-  list-style: none;
-  display: flex;
-  gap: 1rem;
-  padding: var(--space);
-  margin: calc(var(--space) * -1);
-  inline-size: calc(100% + var(--space) * 2);
-  overflow-x: scroll;
-  overscroll-behavior-x: contain;
-  scroll-timeline: --tl-row inline;
-}
-
-/* Enhance with scroll-driven arrow indicators when supported */
-@supports (animation-timeline: --tl) {
-  /* Detect scroll - https://www.bram.us/2023/09/16/solved-by-css-scroll-driven-animations-detect-if-an-element-can-scroll-or-not/ */
-  .row {
-    --opacity: var(--can-scroll) 1;
-
-    animation: detect-scroll linear;
-    animation-timeline: scroll(self inline);
-  }
-
-  @keyframes detect-scroll {
-    from,
-    to {
-      --can-scroll: ;
-    }
-  }
-
-  .row::before,
-  .row::after {
-    --range-start: var(--space);
-    --range-end: calc(var(--range-start) * 4);
-
-    /* Demo visual styles */
-    background-color: var(--btn-bg);
-    background-image: var(--gradient);
-    border-radius: 0.125rem;
-    display: grid;
-    place-content: center;
-    font-size: 0.9rem;
-    width: 2em;
-    aspect-ratio: 1;
-    pointer-events: none;
-
-    /* Positioning */
-    position: absolute;
-    top: 50%;
-    translate: 0 -50%;
-    z-index: 1;
-
-    /* Animation */
-    opacity: var(--opacity, 0);
-    animation-fill-mode: both;
-    animation-name: fade;
-    animation-timeline: --tl-row;
-  }
-
-  .row::before {
-    content: "←";
-    left: 0;
-    animation-range: var(--range-start) var(--range-end);
-  }
-
-  .row::after {
-    --pull: -1;
-    content: "→";
-    right: 0;
-    animation-direction: reverse;
-    animation-range: calc(100% - var(--range-end))
-      calc(100% - var(--range-start));
-  }
-
-  @keyframes fade {
-    from {
-      opacity: 0;
-      translate: calc(50% * var(--pull, 1)) -50%;
-    }
-    to {
-      opacity: 1;
-      translate: 0 -50%;
-    }
-  }
-}
-
-.row li {
-  flex: 0 0 calc(10rem + 5vw);
   display: grid;
   place-items: center;
-  aspect-ratio: 16 / 9;
-  border: 1px solid var(--surface-3);
-  background-color: var(--surface-2);
-  background-image: var(--gradient);
-  border-radius: 0.25rem;
-  text-decoration: none;
-}
-
-@supports (scrollbar-color: auto) {
-  .row {
-    scrollbar-color: var(--surface-4) var(--surface-2);
-    scrollbar-width: thin;
-  }
-}
-
-@supports selector(::-webkit-scrollbar) {
-  .row::-webkit-scrollbar {
-    background: var(--surface-4);
-  }
-  .row::-webkit-scrollbar-thumb {
-    background: var(--surface-2);
-  }
-}
-
-/* Warning for unsupported browsers */
-.warning {
-  background: var(--surface-4);
-  padding: 1rem;
-  width: fit-content;
-  border-radius: 0.2rem;
-}
-
-@supports (animation-timeline: --tl) {
-  .warning {
-    display: none;
-  }
+  color: white;
+  background: #02040c;
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
 }
